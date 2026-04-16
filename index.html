@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKSEL — MUSIC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.8;
+            letter-spacing: 0.3px;
+        }
+
+        /* Vortex background — fixed and owns its own perspective so scrolling doesn't shift it */
+        .vortex-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            perspective: 1200px;
+        }
+
+        .vortex-scene {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            transform-style: preserve-3d;
+            transform: rotateX(5deg);
+        }
+
+        .vortex-ring {
+            position: absolute;
+            width: 0; height: 0;
+            transform-style: preserve-3d;
+        }
+
+        .vortex-item {
+            position: absolute;
+            overflow: hidden;
+            border-radius: 2px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+            background: #000;
+        }
+
+        .vortex-item img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges;
+        }
+
+        /* ── Ring 1 — TOP, wide radius, LARGE tiles ── */
+        .ring1 {
+            transform: translateY(-200px) rotateY(0deg);
+            animation: spin1Fast 5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        .ring1 .vortex-item { width: 240px; height: 240px; margin: -120px 0 0 -120px; opacity: 1; }
+        .ring1 .vortex-item:nth-child(1)  { transform: rotateY(0deg)      translateZ(370px); }
+        .ring1 .vortex-item:nth-child(2)  { transform: rotateY(45deg)     translateZ(370px); }
+        .ring1 .vortex-item:nth-child(3)  { transform: rotateY(90deg)     translateZ(370px); }
+        .ring1 .vortex-item:nth-child(4)  { transform: rotateY(135deg)    translateZ(370px); }
+        .ring1 .vortex-item:nth-child(5)  { transform: rotateY(180deg)    translateZ(370px); }
+        .ring1 .vortex-item:nth-child(6)  { transform: rotateY(225deg)    translateZ(370px); }
+        .ring1 .vortex-item:nth-child(7)  { transform: rotateY(270deg)    translateZ(370px); }
+        .ring1 .vortex-item:nth-child(8)  { transform: rotateY(315deg)    translateZ(370px); }
+
+        /* ── Ring 2 — MIDDLE, medium radius ── */
+        .ring2 {
+            transform: translateY(0px) rotateY(0deg);
+            animation: spin2Fast 5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        .ring2 .vortex-item { width: 200px; height: 200px; margin: -100px 0 0 -100px; opacity: 0.9; }
+        .ring2 .vortex-item:nth-child(1)  { transform: rotateY(0deg)      translateZ(280px); }
+        .ring2 .vortex-item:nth-child(2)  { transform: rotateY(45deg)     translateZ(280px); }
+        .ring2 .vortex-item:nth-child(3)  { transform: rotateY(90deg)     translateZ(280px); }
+        .ring2 .vortex-item:nth-child(4)  { transform: rotateY(135deg)    translateZ(280px); }
+        .ring2 .vortex-item:nth-child(5)  { transform: rotateY(180deg)    translateZ(280px); }
+        .ring2 .vortex-item:nth-child(6)  { transform: rotateY(225deg)    translateZ(280px); }
+        .ring2 .vortex-item:nth-child(7)  { transform: rotateY(270deg)    translateZ(280px); }
+        .ring2 .vortex-item:nth-child(8)  { transform: rotateY(315deg)    translateZ(280px); }
+
+        /* ── Ring 3 — BOTTOM, tight radius, SMALL tiles ── */
+        .ring3 {
+            transform: translateY(180px) rotateY(0deg);
+            animation: spin3Fast 5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        .ring3 .vortex-item { width: 150px; height: 150px; margin: -75px 0 0 -75px; opacity: 0.7; }
+        .ring3 .vortex-item:nth-child(1)  { transform: rotateY(0deg)      translateZ(180px); }
+        .ring3 .vortex-item:nth-child(2)  { transform: rotateY(51.4deg)   translateZ(180px); }
+        .ring3 .vortex-item:nth-child(3)  { transform: rotateY(102.8deg)  translateZ(180px); }
+        .ring3 .vortex-item:nth-child(4)  { transform: rotateY(154.2deg)  translateZ(180px); }
+        .ring3 .vortex-item:nth-child(5)  { transform: rotateY(205.7deg)  translateZ(180px); }
+        .ring3 .vortex-item:nth-child(6)  { transform: rotateY(257.1deg)  translateZ(180px); }
+        .ring3 .vortex-item:nth-child(7)  { transform: rotateY(308.5deg)  translateZ(180px); }
+
+        /* Slow continuous phase — each ring spins at a different rate for twirl feel */
+        .vortex-scene.slowmode .ring1 { animation: spin1Slow 30s linear infinite; }
+        .vortex-scene.slowmode .ring2 { animation: spin2Slow 55s linear infinite; }
+        .vortex-scene.slowmode .ring3 { animation: spin3Slow 80s linear infinite; }
+
+        @keyframes spin1Fast {
+            0%   { transform: translateY(-200px) rotateY(0deg); }
+            100% { transform: translateY(-200px) rotateY(1440deg); }
+        }
+        @keyframes spin2Fast {
+            0%   { transform: translateY(0px) rotateY(0deg); }
+            100% { transform: translateY(0px) rotateY(720deg); }
+        }
+        @keyframes spin3Fast {
+            0%   { transform: translateY(180px) rotateY(0deg); }
+            100% { transform: translateY(180px) rotateY(-540deg); }
+        }
+        @keyframes spin1Slow {
+            from { transform: translateY(-200px) rotateY(0deg); }
+            to   { transform: translateY(-200px) rotateY(360deg); }
+        }
+        @keyframes spin2Slow {
+            from { transform: translateY(0px) rotateY(0deg); }
+            to   { transform: translateY(0px) rotateY(360deg); }
+        }
+        @keyframes spin3Slow {
+            from { transform: translateY(180px) rotateY(0deg); }
+            to   { transform: translateY(180px) rotateY(-360deg); }
+        }
+
+        .container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 80px 32px;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            isolation: isolate;
+            scrollbar-width: none;
+        }
+        .container::-webkit-scrollbar { display: none; }
+
+        header {
+            margin-bottom: 80px;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 40px rgba(255,255,255,0.8), 0 0 60px rgba(255,255,255,0.6);
+        }
+
+        .tagline {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #000000;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            text-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 32px rgba(255,255,255,0.7);
+        }
+
+        .portfolio-link {
+            display: inline-block;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #76C4FF;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .portfolio-link:hover {
+            border-bottom-color: #76C4FF;
+        }
+
+        /* Featured */
+        .featured {
+            margin-bottom: 60px;
+            padding: 40px;
+            border: 1px solid #000000;
+            background: rgba(249, 249, 249, 0.92);
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 60px rgba(255,255,255,0.5);
+        }
+
+        .featured-label {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #76C4FF;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 32px rgba(255,255,255,0.7);
+        }
+
+        .featured-title {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 40px rgba(255,255,255,0.8), 0 0 60px rgba(255,255,255,0.6);
+        }
+
+        .featured-cta {
+            display: inline-block;
+            padding: 10px 22px;
+            border: 1px solid #000000;
+            background: #000000;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .featured-cta:hover {
+            background: #76C4FF;
+            border-color: #76C4FF;
+            color: #ffffff;
+        }
+
+        /* Sections */
+        .section { margin-bottom: 80px; }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 16px;
+        }
+
+        .section-number {
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #76C4FF;
+            font-weight: 700;
+            min-width: 20px;
+            text-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 32px rgba(255,255,255,0.7);
+        }
+
+        .section-title {
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            text-shadow: 0 0 16px rgba(255,255,255,0.9), 0 0 32px rgba(255,255,255,0.7);
+        }
+
+        /* Track list */
+        .tracks-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .track-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 16px;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            text-decoration: none;
+            color: #000000;
+            transition: all 0.2s ease;
+            opacity: 0;
+            will-change: transform, opacity;
+            text-align: left;
+        }
+
+        .track-item.slide-from-left {
+            animation: slideInFromLeft 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .track-item.slide-from-right {
+            animation: slideInFromRight 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes slideInFromLeft {
+            from { opacity: 0; transform: translateX(-40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInFromRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .track-item:hover {
+            border-color: #76C4FF;
+            background: #fff6f2;
+        }
+
+        .track-num {
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #999999;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .track-title {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .track-arrow {
+            font-size: 14px;
+            color: #999999;
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: all 0.2s ease;
+        }
+
+        .track-item:hover .track-arrow {
+            opacity: 1;
+            transform: translateX(0);
+            color: #76C4FF;
+        }
+
+        /* Stream platforms */
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .platform-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            text-decoration: none;
+            color: #000000;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .platform-item:hover {
+            border-color: #76C4FF;
+            background: #fff6f2;
+            color: #76C4FF;
+        }
+
+        /* Socials */
+        .socials {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            padding: 120px 40px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            border-top: none;
+            min-height: 400px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,69,0,0.02));
+        }
+
+        .app-label {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 84px;
+            font-weight: 700;
+            color: #000000;
+            letter-spacing: -2px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            z-index: 5;
+            text-align: center;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+
+        .app-label.visible { opacity: 0.85; }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: none;
+            position: absolute;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08));
+            background: #ffffff;
+            z-index: 10;
+            top: 0; left: 0;
+        }
+
+        .social-link:hover {
+            border-color: #76C4FF;
+            background: #fff6f2;
+            animation-play-state: paused;
+            filter: drop-shadow(0 6px 16px rgba(255, 69, 0, 0.2));
+            transform: scale(1.1) !important;
+        }
+
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+            stroke: #000000;
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .social-link:hover svg { stroke: #76C4FF; }
+
+        footer {
+            margin-top: 120px;
+            padding-top: 40px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 11px;
+            color: #999999;
+            letter-spacing: 1.5px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 60px 20px; }
+            header { margin-bottom: 60px; padding-bottom: 30px; }
+            .logo { font-size: 26px; }
+            .featured { padding: 30px 24px; margin-bottom: 50px; }
+            .featured-title { font-size: 28px; }
+            .section { margin-bottom: 60px; }
+            .platforms-grid { grid-template-columns: 1fr; }
+            footer { margin-top: 80px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Vortex Background -->
+    <div class="vortex-bg">
+        <div class="vortex-scene">
+            <div class="vortex-ring ring1">
+                <div class="vortex-item"><img src="covers/blu-famous.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d0000485138ec1913c0bc30e93f26e3dc" alt=""></div>
+                <div class="vortex-item"><img src="covers/thc.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00004851c3bf32532a9bc441e666226f" alt=""></div>
+                <div class="vortex-item"><img src="covers/lmk.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00004851b60b78074a287639d7953873" alt=""></div>
+                <div class="vortex-item"><img src="covers/flowers.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00001e02903fb0ffabb09975b8c344b0" alt=""></div>
+            </div>
+            <div class="vortex-ring ring2">
+                <div class="vortex-item"><img src="covers/weon.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d0000485138ec1913c0bc30e93f26e3dc" alt=""></div>
+                <div class="vortex-item"><img src="covers/goodlife.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00004851c3bf32532a9bc441e666226f" alt=""></div>
+                <div class="vortex-item"><img src="covers/blu-famous.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00001e025fda6c865cd6d357c02a1af0" alt=""></div>
+                <div class="vortex-item"><img src="covers/thc.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00001e02b60b78074a287639d7953873" alt=""></div>
+            </div>
+            <div class="vortex-ring ring3">
+                <div class="vortex-item"><img src="covers/lmk.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00001e02c3bf32532a9bc441e666226f" alt=""></div>
+                <div class="vortex-item"><img src="covers/flowers.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d0000485138ec1913c0bc30e93f26e3dc" alt=""></div>
+                <div class="vortex-item"><img src="covers/weon.png" alt=""></div>
+                <div class="vortex-item"><img src="https://i.scdn.co/image/ab67616d00001e02903fb0ffabb09975b8c344b0" alt=""></div>
+                <div class="vortex-item"><img src="covers/goodlife.png" alt=""></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">AKSEL</div>
+            <div class="tagline">San Diego · Producer</div>
+            <a href="https://www.aksel.lol/" target="_blank" class="portfolio-link">AKSEL.LOL</a>
+        </header>
+
+        <div class="featured">
+            <div class="featured-label">Featured Track</div>
+            <div class="featured-title">GET FLY</div>
+            <a href="https://open.spotify.com/track/5GPkFM7LtYa6dx3dRmKT9M" target="_blank" class="featured-cta">Listen Now</a>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">01</div>
+                <div class="section-title">Tracks</div>
+            </div>
+            <div class="tracks-grid">
+                <a href="https://open.spotify.com/track/5GPkFM7LtYa6dx3dRmKT9M" target="_blank" class="track-item">
+                    <span class="track-num">01</span><span class="track-title">GET FLY</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/0BMi3kBQ50q7UlCFgEz9o3" target="_blank" class="track-item">
+                    <span class="track-num">02</span><span class="track-title">DANNY PHANTOM</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/0jw6XNFjvdYip7PrWfmPTg" target="_blank" class="track-item">
+                    <span class="track-num">03</span><span class="track-title">NOMORECRYING</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/6PFBfKgg4oCO2Vvspx4MfT" target="_blank" class="track-item">
+                    <span class="track-num">04</span><span class="track-title">SAY CHEESE</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/11SI13Ss2lSZvCxMgAbPvD" target="_blank" class="track-item">
+                    <span class="track-num">05</span><span class="track-title">GO!</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/38NLqwBte3ekzCdylgARID" target="_blank" class="track-item">
+                    <span class="track-num">06</span><span class="track-title">FORU</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/45cC6Y7SHTvjDhujOCJ9D6" target="_blank" class="track-item">
+                    <span class="track-num">07</span><span class="track-title">CTRL</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/2sCS9qYLqQHdJVIk86gvOw" target="_blank" class="track-item">
+                    <span class="track-num">08</span><span class="track-title">DANGEROUS</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/7olXk2Vi37k7DE3DpJq9SN" target="_blank" class="track-item">
+                    <span class="track-num">09</span><span class="track-title">BASQUIAT</span><span class="track-arrow">→</span>
+                </a>
+                <a href="https://open.spotify.com/track/2n0LDvC8YXF0Kmaqe830QH" target="_blank" class="track-item">
+                    <span class="track-num">10</span><span class="track-title">PASTEL</span><span class="track-arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">02</div>
+                <div class="section-title">Stream</div>
+            </div>
+            <div class="platforms-grid">
+                <a href="https://open.spotify.com/artist/7D7SsxRo0mbCNWv91BvTLo" target="_blank" class="platform-item">Spotify</a>
+                <a href="https://soundcloud.com/spicyasian3847" target="_blank" class="platform-item">SoundCloud</a>
+                <a href="https://music.apple.com/us/artist/aksel/1478568691" target="_blank" class="platform-item">Apple Music</a>
+                <a href="https://www.youtube.com/channel/UCmtalnDgWhKmwggPKzGWBtw" target="_blank" class="platform-item">YouTube</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-number">03</div>
+                <div class="section-title">Follow</div>
+            </div>
+            <div class="socials">
+                <div class="app-label"></div>
+                <a href="https://instagram.com/akseuhl" target="_blank" class="social-link" data-app="Instagram">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <circle cx="17.5" cy="6.5" r="1.5"/>
+                    </svg>
+                </a>
+                <a href="https://tiktok.com/@akselwazi" target="_blank" class="social-link" data-app="TikTok">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.68v13.7a2.4 2.4 0 1 1-4.77-2.4A2.4 2.4 0 0 1 9.1 13.66V9.4a6.72 6.72 0 0 1-4.9 2.15A6.72 6.72 0 0 0 12 21.75 6.72 6.72 0 0 0 18.82 15V10.74a4.72 4.72 0 0 0 3.4 1.3V8.04a4.8 4.8 0 0 1-.63-.05z"/>
+                    </svg>
+                </a>
+                <a href="https://open.spotify.com/artist/7D7SsxRo0mbCNWv91BvTLo" target="_blank" class="social-link" data-app="Spotify">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.5 10c.3-.5.8-.8 1.5-.8 1 0 1.8.8 1.8 1.8S11.8 13.8 10.8 13.8c-.3 0-.6-.1-.8-.2M14 8c1.7 0 3.1 1.4 3.1 3.1 0 1.7-1.4 3.1-3.1 3.1"/>
+                    </svg>
+                </a>
+                <a href="https://soundcloud.com/spicyasian3847" target="_blank" class="social-link" data-app="SoundCloud">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 14v4M6 12v6M9 10v8M12 8v10M15 10v8M18 12v6M21 14v4"/>
+                    </svg>
+                </a>
+                <a href="https://www.youtube.com/channel/UCmtalnDgWhKmwggPKzGWBtw" target="_blank" class="social-link" data-app="YouTube">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="2" y="3" width="20" height="18" rx="2.18" ry="2.18"/>
+                        <line x1="7" y1="15" x2="7" y2="9"/>
+                        <line x1="12" y1="15" x2="12" y2="7"/>
+                        <line x1="17" y1="15" x2="17" y2="10"/>
+                    </svg>
+                </a>
+                <a href="mailto:spicyxasian@gmail.com" class="social-link" data-app="Email">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                        <path d="m22 6-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 6"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 AKSEL</p>
+        </footer>
+    </div>
+
+    <script>
+        // Pixelate all vortex cover art to a true 7x7 mosaic
+        (function pixelateVortex() {
+            const PIX = 14;
+            document.querySelectorAll('.vortex-item img').forEach(img => {
+                const originalSrc = img.src;
+                const loader = new Image();
+                loader.crossOrigin = 'anonymous';
+                loader.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = PIX;
+                    canvas.height = PIX;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.drawImage(loader, 0, 0, PIX, PIX);
+                    try {
+                        img.src = canvas.toDataURL();
+                    } catch (e) { /* CORS blocked — keep original */ }
+                };
+                loader.onerror = () => { /* fall back to original */ };
+                loader.src = originalSrc;
+            });
+        })();
+
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const parent = entry.target.parentElement;
+                    const items = Array.from(parent.querySelectorAll('.track-item'));
+                    const idx = items.indexOf(entry.target);
+                    entry.target.classList.add(idx % 2 === 0 ? 'slide-from-left' : 'slide-from-right');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.track-item').forEach(item => observer.observe(item));
+
+        class PhysicsParticle {
+            constructor(element, containerWidth, containerHeight) {
+                this.element = element;
+                this.containerWidth = containerWidth;
+                this.containerHeight = containerHeight;
+                this.size = 44;
+                this.x = Math.random() * (containerWidth - this.size);
+                this.y = Math.random() * (containerHeight - this.size);
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 0.35 + Math.random() * 0.25;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.friction = 1.0;
+                this.bounceDamping = 1.0;
+                this.rotation = 0;
+                this.rotationVelocity = (Math.random() - 0.5) * 0.35;
+            }
+            update(particles) {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.rotationVelocity;
+                if (this.x <= 0) { this.x = 0; this.vx *= -this.bounceDamping; this.rotationVelocity *= -1; }
+                if (this.x >= this.containerWidth - this.size) { this.x = this.containerWidth - this.size; this.vx *= -this.bounceDamping; this.rotationVelocity *= -1; }
+                if (this.y <= 0) { this.y = 0; this.vy *= -this.bounceDamping; }
+                if (this.y >= this.containerHeight - this.size) { this.y = this.containerHeight - this.size; this.vy *= -this.bounceDamping; this.rotationVelocity *= -0.5; }
+                particles.forEach(other => {
+                    if (other === this) return;
+                    const dx = other.x - this.x;
+                    const dy = other.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const minDistance = this.size + other.size;
+                    if (distance < minDistance) {
+                        const angle = Math.atan2(dy, dx);
+                        const sin = Math.sin(angle);
+                        const cos = Math.cos(angle);
+                        const vx1 = this.vx * cos + this.vy * sin;
+                        const vy1 = this.vy * cos - this.vx * sin;
+                        const vx2 = other.vx * cos + other.vy * sin;
+                        const vy2 = other.vy * cos - other.vx * sin;
+                        this.vx = vx2 * cos - vy1 * sin;
+                        this.vy = vy1 * cos + vx2 * sin;
+                        other.vx = vx1 * cos - vy2 * sin;
+                        other.vy = vy2 * cos + vx1 * sin;
+                        const overlap = (minDistance - distance) / 2 + 1;
+                        this.x -= overlap * cos;
+                        this.y -= overlap * sin;
+                        other.x += overlap * cos;
+                        other.y += overlap * sin;
+                    }
+                });
+                this.element.style.transform = `translate(${this.x}px, ${this.y}px) rotate(${this.rotation}deg)`;
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const socialsContainer = document.querySelector('.socials');
+            const socialLinks = Array.from(document.querySelectorAll('.social-link'));
+            if (socialsContainer && socialLinks.length > 0) {
+                let containerWidth = socialsContainer.offsetWidth || 400;
+                let containerHeight = socialsContainer.offsetHeight || 400;
+                const particles = socialLinks.map(link => new PhysicsParticle(link, containerWidth, containerHeight));
+                let animationFrameId;
+                const animate = () => {
+                    particles.forEach(p => p.update(particles));
+                    animationFrameId = requestAnimationFrame(animate);
+                };
+                const appLabel = document.querySelector('.app-label');
+                socialLinks.forEach(link => {
+                    link.addEventListener('mouseenter', () => {
+                        cancelAnimationFrame(animationFrameId);
+                        appLabel.textContent = link.dataset.app;
+                        appLabel.classList.add('visible');
+                    });
+                    link.addEventListener('mouseleave', () => {
+                        animate();
+                        appLabel.classList.remove('visible');
+                    });
+                });
+                window.addEventListener('resize', () => {
+                    containerWidth = socialsContainer.offsetWidth;
+                    containerHeight = socialsContainer.offsetHeight;
+                    particles.forEach(p => { p.containerWidth = containerWidth; p.containerHeight = containerHeight; });
+                });
+                animate();
+            }
+        });
+
+        const vortexScene = document.querySelector('.vortex-scene');
+        const ring1El = document.querySelector('.ring1');
+        if (vortexScene && ring1El) {
+            ring1El.addEventListener('animationend', () => {
+                vortexScene.classList.add('slowmode');
+            });
+        }
+    </script>
+</body>
+</html>
