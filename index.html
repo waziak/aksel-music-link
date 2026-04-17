@@ -514,7 +514,7 @@
         </header>
 
         <div class="featured">
-            <div class="featured-label">Featured Track</div>
+            <div class="featured-label" id="featured-label">Featured Track</div>
             <div class="featured-title">FAMOUS</div>
             <a href="https://open.spotify.com/track/0IdrhErpn7YQS3I4neNLQR" target="_blank" class="featured-cta">Listen Now</a>
         </div>
@@ -645,6 +645,15 @@
                 loader.onerror = () => { /* fall back to original */ };
                 loader.src = originalSrc;
             });
+        })();
+
+        // Show "New Release!" until May 1 2026, then revert to "Featured Track"
+        (function() {
+            var expiry = new Date('2026-05-01T00:00:00');
+            var label = document.getElementById('featured-label');
+            if (label && Date.now() < expiry.getTime()) {
+                label.textContent = 'New Release!';
+            }
         })();
 
         const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
